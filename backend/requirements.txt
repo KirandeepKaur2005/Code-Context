@@ -1,0 +1,5 @@
+tree-sitter-language-pack
+sentence-transformers 
+psycopg2-binary 
+pgvector 
+flask
