@@ -15,11 +15,11 @@ EXTENSION_MAP = {
 IGNORED_DIRS = {
     ".git", "node_modules", ".next", "dist", "build", 
     "target", "venv", ".venv", "__pycache__", ".idea", ".vscode",
-    "instance", "static/uploads", "static/reports"
+    "instance", "static/uploads", "static/reports", ".env", ".env.example"
 }
 
 IGNORED_LOCKFILES = {
-    "package-lock.json", "yarn.lock", "pnpm-lock.yaml"
+    "package-lock.json", "yarn.lock", "pnpm-lock.yaml", 
 }
 
 IGNORED_EXTENSIONS = {
@@ -60,6 +60,13 @@ OVERLAP_LINES = 5
 
 def chunk_text(text):
     lines = text.splitlines()
+
+    if len(lines) <= 80:
+        return [{
+            "start_line": 1,
+            "end_line": len(lines),
+            "content": text
+        }]
 
     chunks = []
     curr_chunks = []
@@ -133,10 +140,10 @@ def process_file(file_path):
         return []
 
 
-    extention = file_path.suffix
+    extension = file_path.suffix
 
-    if extention in EXTENSION_MAP:
-        language = EXTENSION_MAP[extention]
+    if extension in EXTENSION_MAP:
+        language = EXTENSION_MAP[extension]
 
         try:
             # print("Processing:", file_path)
@@ -189,7 +196,7 @@ def process_repository(repo_path):
 
     return all_chunks
 
-nodes = process_repository("../../devsearch")
+# nodes = process_repository("../../devarch")
 
-print(len(nodes))
-print(nodes)
+# print(len(nodes))
+# print(nodes)

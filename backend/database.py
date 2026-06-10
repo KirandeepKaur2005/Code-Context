@@ -75,7 +75,7 @@ def store_chunks(rows):
     cur.close()
     conn.close()
 
-def search_vectors(query_vector, limit=5):
+def search_vectors(query_embedding, repo_name, limit=5):
     conn = get_connection()
     cur = conn.cursor()
 
@@ -90,12 +90,14 @@ def search_vectors(query_vector, limit=5):
                 content,
                 embedding <=> %s::vector AS distance
             FROM codebase_vectors
+            WHERE repo_name = %s
             ORDER BY embedding <=> %s::vector
             LIMIT %s
         """, 
         (
-            query_vector,
-            query_vector,
+            query_embedding,
+            repo_name,
+            query_embedding,
             limit
         )
     )
