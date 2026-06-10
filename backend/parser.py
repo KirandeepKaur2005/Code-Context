@@ -2,7 +2,6 @@ import functools
 from tree_sitter_language_pack import get_parser
 from pathlib import Path
 
-@functools.lru_cache(maxsize=4)
 def get_cached_parser(lang:str):
     return get_parser(lang)
 
@@ -155,6 +154,20 @@ def process_file(file_path):
             pass
     
     return chunk_text(source_code)
+
+def process_single_file(repo_path, file_path):
+    extension = file_path.suffix.lower()
+
+    language = EXTENSION_MAP.get(extension, "text")
+
+    chunks = process_file(file_path)
+
+    for chunk in chunks:
+        chunk["repo_name"] = repo_path.name
+        chunk["file_path"] = str(file_path.relative_to(repo_path))
+        chunk["language"] = language
+
+    return chunks
     
 def process_repository(repo_path):
     repo_path = Path(repo_path)
@@ -178,25 +191,11 @@ def process_repository(repo_path):
         if file_path.name in IGNORED_LOCKFILES:
             continue
 
-        extension = file_path.suffix.lower()
+        chunks = process_single_file(
+            repo_path,
+            file_path
+        )
 
-        if extension in IGNORED_EXTENSIONS:
-            continue
-
-        language = EXTENSION_MAP.get(extension, "text")
-
-        chunks = process_file(file_path)
-
-        for chunk in chunks:
-            chunk["repo_name"] = repo_path.name
-            chunk["file_path"] = str(file_path.relative_to(repo_path))
-            chunk["language"] = language
-
-            all_chunks.append(chunk)
+        all_chunks.append(chunks)
 
     return all_chunks
-
-# nodes = process_repository("../../devarch")
-
-# print(len(nodes))
-# print(nodes)

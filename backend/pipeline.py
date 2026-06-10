@@ -1,4 +1,4 @@
-from parser import process_repository
+from parser import process_repository, process_single_file
 from embedder import get_embedding
 from database import store_chunks
 
@@ -36,5 +36,35 @@ def index_repository(repo_path):
 
     print(f"Indexed {len(chunks)} chunks")
 
-if __name__ == "__main__":
-    index_repository("../../Devsearch")
+def index_file(repo_path, file_path):
+    chunks = process_single_file(repo_path, file_path)
+
+    rows = []
+
+    for chunk in chunks:
+        embedding = get_embedding(
+            chunk["content"]
+        )
+
+        rows.append((
+            chunk["repo_name"],
+            chunk["file_path"],
+            chunk["language"],
+            chunk["start_line"],
+            chunk["end_line"],
+            chunk["content"],
+            embedding
+        ))
+
+    try:
+        store_chunks(rows)
+        print("Embeddings stored for a single file")
+    except Exception as e:
+        print(" --- Error in pipeline.py while storing chunks: ")
+        print(e)
+
+    print(f"Indexed {len(chunks)} chunks")
+
+# if __name__ == "__main__":
+#     # index_repository("../../Devsearch")
+#     start_watching("../../Devsearch")
