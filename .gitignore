@@ -2,3 +2,5 @@
 backend/venv/
 backend/my_repo/
 **/venv/
+
+**/__pycache__/

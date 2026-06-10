@@ -118,8 +118,4 @@ def start_watching(repo_path):
     except KeyboardInterrupt:
         observer.stop()
     
-    observer.join()    
-
-if __name__ == "__main__":
-    # index_repository("../../Devsearch")
-    start_watching("../../Devsearch") 
+    observer.join()     

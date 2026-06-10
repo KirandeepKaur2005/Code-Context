@@ -196,6 +196,6 @@ def process_repository(repo_path):
             file_path
         )
 
-        all_chunks.append(chunks)
+        all_chunks.extend(chunks)
 
     return all_chunks
