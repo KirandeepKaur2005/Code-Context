@@ -22,11 +22,30 @@ IGNORED_LOCKFILES = {
 }
 
 IGNORED_EXTENSIONS = {
-    ".svg",
-    ".png",
-    ".jpg",
-    ".jpeg",
-    ".ico",
+    # Images
+    ".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".ico",
+
+    # Documents
+    ".pdf", ".doc", ".docx", ".ppt", ".pptx",
+    ".xls", ".xlsx", ".csv",
+
+    # Archives
+    ".zip", ".rar", ".7z", ".tar", ".gz",
+
+    # Databases
+    ".db", ".sqlite", ".sqlite3",
+
+    # Fonts
+    ".ttf", ".otf", ".woff", ".woff2",
+
+    # Binaries
+    ".exe", ".dll", ".so", ".dylib",
+    ".bin", ".dat",
+
+    # Compiled files
+    ".pyc", ".class",
+
+    # Locks
     ".lock"
 }
 

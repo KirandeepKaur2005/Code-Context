@@ -69,7 +69,6 @@ def generate_response(question, context):
     Answer:
     - Be brief and concise with answers
     - List relevant files
-    - Explain how the implementation works
     - Mention important functions/classes
     - Mention the flow if relevant
 

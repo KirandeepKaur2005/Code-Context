@@ -7,6 +7,7 @@ from rag import ask
 from pipeline import index_repository
 from file_watchdog import start_watching
 from llm import warmup_model, unload_model
+from database import get_already_indexed_repos
 
 app = Flask(__name__)
 CORS(app)
@@ -64,10 +65,13 @@ def index_repo():
     })
 
 
-@app.route("/health")
-def health():
-    return {"status": "ok"}
+@app.route("/repos")
+def get_repos():
+    repos = get_already_indexed_repos()
 
+    return jsonify({
+        "repos": repos
+    })
 
 if __name__ == "__main__":
     app.run(

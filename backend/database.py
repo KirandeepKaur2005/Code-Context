@@ -143,5 +143,23 @@ def clear_repository(repo_name):
     cur.close()
     conn.close()
 
+def get_already_indexed_repos():
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+            SELECT DISTINCT repo_name
+            FROM codebase_vectors;
+        """
+    )
+
+    results = [row[0] for row in cur.fetchall()]
+
+    cur.close()
+    conn.close()
+
+    return results
+
 if __name__ == "__main__":
     init_db()
