@@ -109,16 +109,19 @@ def search_vectors(query_embedding, repo_name, limit=5):
 
     return results
 
-def clear_file_vectors(file_path):
+def clear_file_vectors(file_path, repo_name):
     conn = get_connection()
     cur = conn.cursor()
 
     cur.execute(
         """
             DELETE FROM codebase_vectors 
-            WHERE file_path = %s;
+            WHERE file_path = %s and repo_name = %s;
         """, 
-        (file_path,) # need a tuple here
+        (
+            file_path,
+            repo_name
+        ) # need a tuple here
     )
 
     conn.commit()

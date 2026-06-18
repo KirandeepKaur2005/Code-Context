@@ -120,15 +120,21 @@ export default function App() {
         setStatus("indexing");
         setMessages([]);
 
+        const name = inferRepoName(trimmedPath);
+
         try {
             const res = await fetch(`${API}/index`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({repo_path: trimmedPath})
+                body: JSON.stringify(
+                    {
+                        repo_path: trimmedPath,
+                        repo_name: name
+                    }
+                )
             });
 
             if (res.ok) {
-                const name = inferRepoName(trimmedPath);
                 setRepoName(name);
                 setPathError("");
                 setStatus("ready");

@@ -11,9 +11,9 @@ pending_timers = {}
 
 IGNORED_DIRS = {"venv", ".venv", "__pycache__", ".git", "node_modules"}
 
-def reindex_file(repo_path, file_path):
+def reindex_file(repo_path, repo_name, file_path):
     from pipeline import index_file
-    print(f"Reindexing: {file_path}")
+    print(f"=== Reindexing: {file_path} for repo: {repo_name}")
 
     pending_timers.pop(str(file_path), None)
 
@@ -21,14 +21,15 @@ def reindex_file(repo_path, file_path):
         Path(file_path).relative_to(repo_path)
     )
 
-    clear_file_vectors(rel_path)
+    clear_file_vectors(file_path=rel_path, repo_name=repo_name)
 
     index_file(
-        Path(repo_path),
-        Path(file_path)
+        repo_path=Path(repo_path),
+        repo_name=repo_name,
+        file_path=Path(file_path),
     )
 
-def schedule_reindex(repo_path, file_path):
+def schedule_reindex(repo_path, repo_name, file_path):
     file_path = str(file_path)
 
     if file_path in pending_timers:
@@ -37,7 +38,7 @@ def schedule_reindex(repo_path, file_path):
     timer = Timer(
         DEBOUNCE_SECONDS,
         reindex_file,
-        args=(repo_path, file_path)
+        args=(repo_path, repo_name, file_path)
     )
 
     pending_timers[file_path] = timer
@@ -45,8 +46,9 @@ def schedule_reindex(repo_path, file_path):
 
 class Handler(FileSystemEventHandler):
 
-    def __init__(self, repo_path):
+    def __init__(self, repo_path, repo_name):
         self.repo_path = repo_path
+        self.repo_name = repo_name
     
     def on_created(self, event):
         
@@ -60,7 +62,7 @@ class Handler(FileSystemEventHandler):
         ):
             return
         
-        schedule_reindex(self.repo_path, event.src_path)
+        schedule_reindex(self.repo_path, self.repo_name, event.src_path)
 
     def on_modified(self, event):
         
@@ -74,7 +76,7 @@ class Handler(FileSystemEventHandler):
         ):
             return
         
-        schedule_reindex(self.repo_path, event.src_path)
+        schedule_reindex(self.repo_path, self.repo_name, event.src_path)
     
     def on_deleted(self, event):
         
@@ -85,7 +87,7 @@ class Handler(FileSystemEventHandler):
             Path(event.src_path).relative_to(self.repo_path)
         )
 
-        clear_file_vectors(rel_path)
+        clear_file_vectors(file_path=rel_path, repo_name=self.repo_name)
 
     def on_moved(self, event):
 
@@ -96,21 +98,21 @@ class Handler(FileSystemEventHandler):
             Path(event.src_path).relative_to(self.repo_path)
         )
 
-        clear_file_vectors(old_rel)
+        clear_file_vectors(file_path=old_rel, repo_name=self.repo_name)
 
-        schedule_reindex(self.repo_path, event.dest_path)
+        schedule_reindex(self.repo_path, self.repo_name, event.dest_path)
 
-def start_watching(repo_path):
+def start_watching(repo_path, repo_name):
     observer = Observer()
 
     observer.schedule(
-        Handler(repo_path),
+        Handler(repo_path, repo_name),
         path=repo_path,
         recursive=True,
     )
 
     observer.start()
-    print(f"Watching {repo_path}")
+    print(f" === Watching {repo_path}")
 
     try:
         while True:

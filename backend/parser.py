@@ -157,7 +157,6 @@ def process_file(file_path):
     except Exception as e:
         return []
 
-
     extension = file_path.suffix
 
     if extension in EXTENSION_MAP:
@@ -174,7 +173,7 @@ def process_file(file_path):
     
     return chunk_text(source_code)
 
-def process_single_file(repo_path, file_path):
+def process_single_file(repo_path, repo_name, file_path):
     extension = file_path.suffix.lower()
 
     language = EXTENSION_MAP.get(extension, "text")
@@ -182,13 +181,13 @@ def process_single_file(repo_path, file_path):
     chunks = process_file(file_path)
 
     for chunk in chunks:
-        chunk["repo_name"] = repo_path.name
+        chunk["repo_name"] = repo_name
         chunk["file_path"] = str(file_path.relative_to(repo_path))
         chunk["language"] = language
 
     return chunks
     
-def process_repository(repo_path):
+def process_repository(repo_path, repo_name):
     repo_path = Path(repo_path)
 
     all_chunks = []
@@ -211,8 +210,9 @@ def process_repository(repo_path):
             continue
 
         chunks = process_single_file(
-            repo_path,
-            file_path
+            repo_path=repo_path,
+            repo_name=repo_name,
+            file_path=file_path
         )
 
         all_chunks.extend(chunks)

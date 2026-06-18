@@ -14,7 +14,6 @@ CORS(app)
 
 ACTIVE_WATCHERS = set()
 
-warmup_model()
 atexit.register(unload_model)
 
 @app.route("/query", methods=["POST"])
@@ -42,26 +41,33 @@ def index_repo():
     data = request.json
 
     repo_path = data.get("repo_path")
+    repo_name = data.get("repo_name")
 
     if not repo_path:
         return jsonify({
             "error": "repo_path required"
         }), 400
+    
+    if not repo_name:
+        from pathlib import Path
+        repo_name = Path(repo_path).name or "repo"
+        print(f"⚠️ repo_name was missing! Inferred name from path: {repo_name}")
 
-    index_repository(repo_path)
+    index_repository(repo_path=repo_path, repo_name=repo_name)
 
     if repo_path not in ACTIVE_WATCHERS:
 
         Thread(
             target=start_watching,
-            args=(repo_path,),
+            args=(repo_path, repo_name),
             daemon=True
         ).start()
 
         ACTIVE_WATCHERS.add(repo_path)
 
     return jsonify({
-        "message": "Repository indexed successfully"
+        "message": "Repository indexed successfully",
+        "repo_name": repo_name
     })
 
 
@@ -74,6 +80,8 @@ def get_repos():
     })
 
 if __name__ == "__main__":
+    warmup_model()
+
     app.run(
         host="0.0.0.0",
         port=5000,

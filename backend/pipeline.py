@@ -2,8 +2,8 @@ from parser import process_repository, process_single_file
 from embedder import get_embedding
 from database import store_chunks
 
-def index_repository(repo_path):
-    chunks = process_repository(repo_path)
+def index_repository(repo_path, repo_name):
+    chunks = process_repository(repo_path=repo_path, repo_name=repo_name)
 
     rows = []
 
@@ -36,8 +36,8 @@ def index_repository(repo_path):
 
     print(f"Indexed {len(chunks)} chunks")
 
-def index_file(repo_path, file_path):
-    chunks = process_single_file(repo_path, file_path)
+def index_file(repo_path, repo_name, file_path):
+    chunks = process_single_file(repo_path=repo_path, repo_name=repo_name, file_path=file_path)
 
     rows = []
 
